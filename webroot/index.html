@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>NetWhitelist 配置</title>
+<style>
+  :root {
+    --bg: #12141a;
+    --card: #1b1f2a;
+    --border: #2a3040;
+    --fg: #e8ecf4;
+    --muted: #9aa4b8;
+    --accent: #4c8dff;
+    --good: #3ecf7d;
+    --bad: #ff5f6d;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 16px;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin-bottom: 16px; font-size: 12px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+  .card h2 { font-size: 13px; margin: 0 0 8px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+  .status-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+  .dot.on { background: var(--good); box-shadow: 0 0 6px var(--good); }
+  .dot.off { background: var(--bad); }
+  #status-text { color: var(--muted); }
+  #log-box {
+    margin-top: 8px;
+    background: #0d0f14;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px;
+    font-family: ui-monospace, monospace;
+    font-size: 11px;
+    color: var(--muted);
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 140px;
+    overflow: auto;
+  }
+  textarea {
+    width: 100%;
+    min-height: 320px;
+    background: #0d0f14;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--fg);
+    font-family: ui-monospace, monospace;
+    font-size: 12px;
+    padding: 10px;
+    resize: vertical;
+    outline: none;
+  }
+  textarea:focus { border-color: var(--accent); }
+  .btn-row { display: flex; gap: 10px; margin-top: 12px; }
+  button {
+    flex: 1;
+    padding: 12px 0;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--border);
+    color: var(--fg);
+  }
+  button.primary { background: var(--accent); color: #fff; }
+  button:active { opacity: .75; }
+  button:disabled { opacity: .4; }
+  #msg { margin-top: 10px; font-size: 12px; min-height: 18px; color: var(--good); }
+  #msg.err { color: var(--bad); }
+  .tip { color: var(--muted); font-size: 12px; margin-top: 8px; }
+  code { background: #0d0f14; padding: 1px 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+  <h1>NetWhitelist 出站防火墙</h1>
+  <div class="sub">eBPF cgroup 白名单 · 默认拒绝 · 热重载</div>
+
+  <div class="card">
+    <h2>运行状态</h2>
+    <div class="status-row">
+      <span id="dot" class="dot off"></span>
+      <span id="status-text">正在检测…</span>
+    </div>
+    <div id="log-box">…</div>
+  </div>
+
+  <div class="card">
+    <h2>规则文件 whitelist.conf</h2>
+    <textarea id="conf" spellcheck="false" placeholder="加载中…"></textarea>
+    <div class="btn-row">
+      <button id="btn-save" class="primary">保存并重载</button>
+      <button id="btn-reload">仅重载</button>
+      <button id="btn-refresh">刷新</button>
+    </div>
+    <div id="msg"></div>
+    <div class="tip">
+      规则语法：
+      <code>RULE4=tcp|目标IP|起始端口|结束端口</code>，
+      <code>RULE6=udp|2000::/3|53|53</code>，
+      <code>*</code> 表示任意目标；
+      端口 53 / 8081 / 16001 / 17000-17001、端点 112.80.130.26:31006、五个网关 IP 的 443、
+      IPv6 2000::/3 的 53。改完点“保存并重载”即生效。
+    </div>
+  </div>
+
+<script type="module">
+import { exec } from 'kernelsu';
+
+const CTL = '/data/adb/modules/netwhitelist/webui_ctl.sh';
+const $ = (id) => document.getElementById(id);
+const msgEl = $('msg');
+
+function setMsg(text, isErr) {
+  msgEl.textContent = text;
+  msgEl.className = isErr ? 'err' : '';
+}
+
+function toBase64(str) {
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin);
+}
+
+function run(cmd) {
+  try {
+    return exec(cmd);
+  } catch (e) {
+    return { errno: -1, stdout: '', stderr: String(e) };
+  }
+}
+
+function refreshStatus() {
+  const s = run(`sh ${CTL} status`).stdout.trim();
+  $('dot').className = 'dot ' + (s.startsWith('running') ? 'on' : 'off');
+  $('status-text').textContent = s || '未知';
+  const log = run(`sh ${CTL} tail`).stdout.trim();
+  $('log-box').textContent = log || '（无日志）';
+}
+
+function refreshConf() {
+  const r = run(`sh ${CTL} read`);
+  if (r.errno === 0) {
+    $('conf').value = r.stdout;
+    setMsg('已读取配置');
+  } else {
+    setMsg('读取配置失败: ' + (r.stderr || r.errno), true);
+  }
+}
+
+async function saveAndReload() {
+  const btn = $('btn-save');
+  btn.disabled = true;
+  try {
+    const b64 = toBase64($('conf').value);
+    const r = run(`sh ${CTL} write ${b64}`);
+    setMsg(r.errno === 0 ? '已保存并触发重载' : '保存失败: ' + (r.stderr || r.errno), r.errno !== 0);
+    if (r.errno === 0) refreshStatus();
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function reloadOnly() {
+  const r = run(`sh ${CTL} reload`);
+  setMsg(r.errno === 0 ? '已发送重载信号' : '重载失败: ' + (r.stderr || r.errno), r.errno !== 0);
+  refreshStatus();
+}
+
+$('btn-save').addEventListener('click', saveAndReload);
+$('btn-reload').addEventListener('click', reloadOnly);
+$('btn-refresh').addEventListener('click', () => { refreshConf(); refreshStatus(); });
+
+refreshStatus();
+refreshConf();
+</script>
+</body>
+</html>

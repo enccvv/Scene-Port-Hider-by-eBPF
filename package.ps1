@@ -1,10 +1,10 @@
 param(
-    [string]$Output = "..\hideSceneport_module.zip"
+    [string]$Output = "..\netwhitelist_module.zip"
 )
 
 $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
-$Loader = Join-Path $Root "system\bin\hideport_loader"
+$Loader = Join-Path $Root "system\bin\wl_loader"
 if ([System.IO.Path]::IsPathRooted($Output)) {
     $OutputPath = $Output
 } else {
@@ -39,26 +39,29 @@ if ($BtfSource) {
 
 $items = @(
     "module.prop",
-    "hideport.conf",
+    "whitelist.conf",
     "post-fs-data.sh",
     "service.sh",
-    "hideport_start.sh",
+    "whitelist_start.sh",
     "customize.sh",
-    "uninstall.sh"
+    "uninstall.sh",
+    "webui_ctl.sh",
+    "webroot\index.html"
 )
 
 if (Test-Path -LiteralPath $Fingerprint) {
     $items += "kernel_btf.sha256"
 }
 
-$Stage = Join-Path ([System.IO.Path]::GetTempPath()) ("hideSceneport-package-" + [Guid]::NewGuid().ToString("N"))
+$Stage = Join-Path ([System.IO.Path]::GetTempPath()) ("netwhitelist-package-" + [Guid]::NewGuid().ToString("N"))
 try {
     New-Item -ItemType Directory -Path (Join-Path $Stage "system\bin") -Force | Out-Null
 
     foreach ($item in $items) {
         Copy-Item -LiteralPath (Join-Path $Root $item) -Destination (Join-Path $Stage $item) -Force
     }
-    Copy-Item -LiteralPath $Loader -Destination (Join-Path $Stage "system\bin\hideport_loader") -Force
+    Copy-Item -LiteralPath $Loader -Destination (Join-Path $Stage "system\bin\wl_loader") -Force
+    Copy-Item -LiteralPath (Join-Path $Root "system\bin\whitelist.bpf.o") -Destination (Join-Path $Stage "system\bin\whitelist.bpf.o") -Force
 
     $archiveItems = Get-ChildItem -LiteralPath $Stage -Force
     Compress-Archive -LiteralPath $archiveItems.FullName -DestinationPath $OutputPath -Force

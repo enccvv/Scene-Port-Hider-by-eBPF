@@ -12,7 +12,7 @@ on:
         description: "Release tag to create when create_release is true"
         required: false
         type: string
-        default: "v2.0.1"
+        default: "v1.0.0"
   push:
     tags:
       - "v*"
@@ -49,8 +49,8 @@ jobs:
       - name: Cache Android arm64 dependencies
         uses: actions/cache@v4
         with:
-          path: ~/hideport-deps
-          key: hideport-deps-r25c-${{ runner.os }}-${{ hashFiles('build_deps_android.sh') }}
+          path: ~/netwhitelist-deps
+          key: netwhitelist-deps-r25c-${{ runner.os }}-${{ hashFiles('build_deps_android.sh') }}
 
       - name: Build module from BTF
         run: |
@@ -58,14 +58,14 @@ jobs:
 
       - name: Stage module zip
         run: |
-          cp ../hideSceneport_module.zip ./hideSceneport_module.zip
-          ls -lh ./hideSceneport_module.zip
+          cp ../netwhitelist_module.zip ./netwhitelist_module.zip
+          ls -lh ./netwhitelist_module.zip
 
       - name: Upload module zip
         uses: actions/upload-artifact@v4
         with:
-          name: ScenePortHider_Release
-          path: hideSceneport_module.zip
+          name: NetWhitelist_Release
+          path: netwhitelist_module.zip
           if-no-files-found: error
 
       - name: Create GitHub Release
@@ -74,10 +74,10 @@ jobs:
         with:
           tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
           target_commitish: ${{ github.sha }}
-          name: Scene Port Hider by eBPF ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
+          name: NetWhitelist eBPF Firewall ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
           body: |
             KernelSU module built by GitHub Actions.
 
             This package is tied to the target kernel BTF committed in this repository.
             For other devices or kernels, fork the repository and rebuild with that device's BTF.
-          files: hideSceneport_module.zip
+          files: netwhitelist_module.zip

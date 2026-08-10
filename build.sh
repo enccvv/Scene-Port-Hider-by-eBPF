@@ -65,20 +65,19 @@ mkdir -p "$OUT"
 "$BPF_CC" -target bpf -D__TARGET_ARCH_arm64 -g -O2 \
     -I"$SRC" \
     -I"$LIBBPF_HEADERS" \
-    -c "$SRC/hideport.bpf.c" \
-    -o "$OUT/hideport.bpf.o"
+    -c "$SRC/whitelist.bpf.c" \
+    -o "$OUT/whitelist.bpf.o"
 
-"$BPFTOOL" gen skeleton "$OUT/hideport.bpf.o" > "$SRC/hideport.skel.h"
+"$BPFTOOL" gen skeleton "$OUT/whitelist.bpf.o" > "$SRC/whitelist.skel.h"
 
 "$TARGET_CC" -O2 -Wall -Wextra -static \
     -I"$SRC" \
     -I"$LIBBPF_HEADERS" \
     -L"$LIBBPF_LIBDIR" \
-    -o "$OUT/hideport_loader" \
-    "$SRC/hideport_loader.c" \
-    "$SRC/tls_align.S" \
+    -o "$OUT/wl_loader" \
+    "$SRC/whitelist_loader.c" \
     -lbpf -lelf -lz $EXTRA_LDLIBS
 
-chmod 0755 "$OUT/hideport_loader" 2>/dev/null || \
-    echo "Warning: could not chmod $OUT/hideport_loader; this is normal on some /mnt/* WSL mounts."
-echo "Built $OUT/hideport_loader and $OUT/hideport.bpf.o"
+chmod 0755 "$OUT/wl_loader" 2>/dev/null || \
+    echo "Warning: could not chmod $OUT/wl_loader; this is normal on some /mnt/* WSL mounts."
+echo "Built $OUT/wl_loader and $OUT/whitelist.bpf.o"

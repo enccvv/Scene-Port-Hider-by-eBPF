@@ -6,7 +6,7 @@ ANDROID_API="${ANDROID_API:-26}"
 ANDROID_NDK="${ANDROID_NDK:-$HOME/android-ndk-r25c}"
 NDK_ZIP="${NDK_ZIP:-$HOME/android-ndk-r25c-linux.zip}"
 NDK_URL="${NDK_URL:-https://dl.google.com/android/repository/android-ndk-r25c-linux.zip}"
-DEPS_DIR="${DEPS_DIR:-$HOME/hideport-deps}"
+DEPS_DIR="${DEPS_DIR:-$HOME/netwhitelist-deps}"
 PREFIX="${PREFIX:-$DEPS_DIR/android-arm64}"
 BPFTOOL="${BPFTOOL:-}"
 REMOTE_BTF="/storage/emulated/0/Download/vmlinux.btf"
@@ -81,7 +81,7 @@ export DEPS_DIR
 export PREFIX
 bash "$ROOT/build_deps_android.sh"
 
-echo "==> Building hideport module binaries"
+echo "==> Building netwhitelist module binaries"
 export LIBBPF_SRC="$PREFIX"
 export LIBBPF_HEADERS="$PREFIX/include"
 export LIBBPF_LIBDIR="$PREFIX/lib"
@@ -94,9 +94,9 @@ bash "$ROOT/package.sh"
 cat <<EOF
 
 Done:
-  $ROOT/../hideSceneport_module.zip
+  $ROOT/../netwhitelist_module.zip
 
 Install this zip in KernelSU Manager, then reboot.
 Logs on device:
-  /data/adb/modules/hideSceneport/hideport.log
+  /data/adb/modules/netwhitelist/whitelist.log
 EOF

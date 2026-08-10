@@ -8,8 +8,8 @@ This is the safest path for unknown phones and kernels. The user needs WSL/Linux
 ADB, root access on the phone, and `/sys/kernel/btf/vmlinux`.
 
 ```sh
-git clone https://github.com/YOUR_NAME/hideport_module.git
-cd hideport_module
+git clone https://github.com/YOUR_NAME/netwhitelist.git
+cd netwhitelist
 bash tools/build_for_connected_device.sh
 ```
 
@@ -19,8 +19,8 @@ The script:
 - generates `src/vmlinux.h` with `bpftool`;
 - downloads Android NDK r25c if needed;
 - builds Android arm64 `libz.a`, `libelf.a`, and `libbpf.a`;
-- builds `hideport_loader` and `hideport.bpf.o`;
-- writes `../hideSceneport_module.zip`.
+- builds `wl_loader` and `whitelist.bpf.o`;
+- writes `../netwhitelist_module.zip`.
 
 The user installs the zip in KernelSU Manager and reboots.
 
@@ -38,8 +38,8 @@ target kernel BTF to the fork.
 User flow:
 
 ```sh
-git clone https://github.com/USER/hideport_module.git
-cd hideport_module
+git clone https://github.com/USER/netwhitelist.git
+cd netwhitelist
 mkdir -p btf
 adb shell su -c 'cp /sys/kernel/btf/vmlinux /storage/emulated/0/Download/vmlinux.btf && chmod 0644 /storage/emulated/0/Download/vmlinux.btf'
 adb pull /storage/emulated/0/Download/vmlinux.btf ./btf/vmlinux.btf
@@ -55,7 +55,7 @@ Then open the fork on GitHub:
 Actions -> Build KernelSU module -> Run workflow
 ```
 
-The finished `hideSceneport_module.zip` appears as a workflow artifact.
+The finished `netwhitelist_module.zip` appears as a workflow artifact.
 To publish a Release from Actions, enable `Create a GitHub Release` when running
 the workflow, or push a tag like `v1.0-device-name`. The workflow downloads the
 official prebuilt `bpftool` release, so it does not depend on the runner kernel's
@@ -69,7 +69,7 @@ If users do not want to commit `vmlinux.btf`, they can generate and commit
 You can publish prebuilt zips, but label them by device and kernel:
 
 ```text
-hideSceneport_OP5D0DL1_kernel-5.10.x_2026-04-25.zip
+netwhitelist_OP5D0DL1_kernel-6.1.25_2026-08-10.zip
 ```
 
 Prebuilt packages are only expected to work on matching or very similar kernels.

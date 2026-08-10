@@ -1,6 +1,6 @@
-id=hideSceneport
-name=Scene Port Hider by eBPF
-version=v2.0.3
-versionCode=5
-author=Andrea-Lyz
-description=Hide Scene loopback connect probes for configured ports with an eBPF cgroup module
+id=netwhitelist
+name=NetWhitelist eBPF Firewall
+version=v1.0.0
+versionCode=1
+author=NetWhitelist
+description=Outbound whitelist firewall enforced with eBPF cgroup hooks (connect4/6, udp4/6 sendmsg). Rules live in whitelist.conf and reload on SIGUSR1; configure from the KernelSU Manager app page.

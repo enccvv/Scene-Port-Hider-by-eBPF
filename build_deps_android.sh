@@ -35,8 +35,8 @@ cd "$DEPS_DIR/src"
 mkdir -p "$PREFIX/include"
 if [[ ! -f "$PREFIX/include/libintl.h" ]]; then
     cat > "$PREFIX/include/libintl.h" <<'EOF_STUB'
-#ifndef HIDEPORT_STUB_LIBINTL_H
-#define HIDEPORT_STUB_LIBINTL_H
+#ifndef NETWHITELIST_STUB_LIBINTL_H
+#define NETWHITELIST_STUB_LIBINTL_H
 
 #define gettext(String) (String)
 #define dgettext(Domain, String) (String)
@@ -225,7 +225,7 @@ Dependencies are ready:
   LIBELF_LIBRARY=$PREFIX/lib/libelf.a
   ZLIB_LIBRARY=$PREFIX/lib/libz.a
 
-To build hideport:
+To build netwhitelist:
   export ANDROID_NDK="$ANDROID_NDK"
   export LIBBPF_SRC="$PREFIX"
   export LIBBPF_HEADERS="$PREFIX/include"

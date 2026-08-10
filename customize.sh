@@ -30,10 +30,10 @@ calc_sha256() {
 }
 
 # ── Kernel BTF fingerprint verification (top-level, always runs) ──
-ui_print "- Installing Scene Port Hider by eBPF"
+ui_print "- Installing NetWhitelist eBPF Firewall"
 
 expected_file="$MODPATH/kernel_btf.sha256"
-tmp_expected="${TMPDIR:-/dev}/hideSceneport_kernel_btf.sha256"
+tmp_expected="${TMPDIR:-/dev}/netwhitelist_kernel_btf.sha256"
 current_btf="/sys/kernel/btf/vmlinux"
 
 # Try extracting from the zip if the file wasn't unpacked to MODPATH
@@ -66,15 +66,16 @@ if [ "$expected" != "$actual" ]; then
 fi
 
 ui_print "- Kernel BTF matched"
-ui_print "- Edit hideport.conf if your package or ports differ"
+ui_print "- Edit whitelist.conf to change firewall rules"
 
-rm -rf "$MODPATH/service.d" "$MODPATH/hide_scene_port.sh"
+# Remove leftovers from the previous Scene-port module.
+rm -rf "$MODPATH/service.d" "$MODPATH/hideport_start.sh" "$MODPATH/hideport.conf" "$MODPATH/system/bin/hideport_loader"
 
 # ── Permissions ──
 set_permissions() {
     set_perm_recursive "$MODPATH" 0 0 0755 0644
     set_perm "$MODPATH/post-fs-data.sh" 0 0 0755
     set_perm "$MODPATH/service.sh" 0 0 0755
-    set_perm "$MODPATH/hideport_start.sh" 0 0 0755
-    set_perm "$MODPATH/system/bin/hideport_loader" 0 0 0755
+    set_perm "$MODPATH/whitelist_start.sh" 0 0 0755
+    set_perm "$MODPATH/system/bin/wl_loader" 0 0 0755
 }

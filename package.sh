@@ -2,10 +2,10 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ZIP="${1:-$ROOT/../hideSceneport_module.zip}"
+ZIP="${1:-$ROOT/../netwhitelist_module.zip}"
 
-if [[ ! -f "$ROOT/system/bin/hideport_loader" ]]; then
-    echo "Missing executable: $ROOT/system/bin/hideport_loader" >&2
+if [[ ! -f "$ROOT/system/bin/wl_loader" ]]; then
+    echo "Missing executable: $ROOT/system/bin/wl_loader" >&2
     echo "Run ./build.sh first." >&2
     exit 1
 fi
@@ -33,13 +33,16 @@ fi
     cd "$ROOT"
     files=(
         module.prop
-        hideport.conf
+        whitelist.conf
         post-fs-data.sh
         service.sh
-        hideport_start.sh
+        whitelist_start.sh
         customize.sh
         uninstall.sh
-        system/bin/hideport_loader
+        webui_ctl.sh
+        webroot/index.html
+        system/bin/wl_loader
+        system/bin/whitelist.bpf.o
     )
     if [[ -f kernel_btf.sha256 ]]; then
         files+=(kernel_btf.sha256)

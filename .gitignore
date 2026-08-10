@@ -1,11 +1,10 @@
 deps/
 /vmlinux.btf
 /btf/vmlinux.btf
-/hideport_module.zip
-/hideSceneport_module.zip
+/netwhitelist_module.zip
 /kernel_btf.sha256
 src/vmlinux.h
-src/hideport.skel.h
-system/bin/hideport_loader
-system/bin/hideport.bpf.o
+src/whitelist.skel.h
+system/bin/wl_loader
+system/bin/whitelist.bpf.o
 *.log
