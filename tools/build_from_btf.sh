@@ -72,12 +72,13 @@ EOF
     exit 1
 fi
 
-echo "==> Building Android arm64 dependencies"
-export ANDROID_NDK
-export ANDROID_API
-export DEPS_DIR
-export PREFIX
-bash "$ROOT/build_deps_android.sh"
+echo "==> Building netwhitelist module binaries"
+export LIBBPF_SRC="$PREFIX"
+export LIBBPF_HEADERS="$PREFIX/include"
+export LIBBPF_LIBDIR="$PREFIX/lib"
+export BPFTOOL
+export EXTRA_LDLIBS="-Wl,-z,max-page-size=0x1000 -Wl,-z,common-page-size=0x1000"
+bash "$ROOT/build.sh"
 
 echo "==> Building netwhitelist module binaries"
 export LIBBPF_SRC="$PREFIX"
