@@ -10,7 +10,7 @@ Built for the Meizu 21 Pro running Android 16 / KernelSU on
 
 ## How it works
 
-- The `wl_loader` daemon loads `whitelist.bpf.o` and attaches four programs to
+- The `wl_loader` daemon loads `wl.bpf.o` and attaches four programs to
   the root cgroup v2 (`/sys/fs/cgroup`):
   - `cgroup/connect4`, `cgroup/connect6` - outbound TCP/UDP connection attempts;
   - `cgroup/udp4_sendmsg`, `cgroup/udp6_sendmsg` - datagram sends on

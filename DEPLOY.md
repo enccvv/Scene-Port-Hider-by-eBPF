@@ -19,7 +19,7 @@ The script:
 - generates `src/vmlinux.h` with `bpftool`;
 - downloads Android NDK r25c if needed;
 - builds Android arm64 `libz.a`, `libelf.a`, and `libbpf.a`;
-- builds `wl_loader` and `whitelist.bpf.o`;
+- builds `wl_loader` and `wl.bpf.o`;
 - writes `../netwhitelist_module.zip`.
 
 The user installs the zip in KernelSU Manager and reboots.

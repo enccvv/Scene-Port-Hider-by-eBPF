@@ -61,7 +61,7 @@ try {
         Copy-Item -LiteralPath (Join-Path $Root $item) -Destination (Join-Path $Stage $item) -Force
     }
     Copy-Item -LiteralPath $Loader -Destination (Join-Path $Stage "system\bin\wl_loader") -Force
-    Copy-Item -LiteralPath (Join-Path $Root "system\bin\whitelist.bpf.o") -Destination (Join-Path $Stage "system\bin\whitelist.bpf.o") -Force
+    Copy-Item -LiteralPath (Join-Path $Root "system\bin\wl.bpf.o") -Destination (Join-Path $Stage "system\bin\wl.bpf.o") -Force
 
     $archiveItems = Get-ChildItem -LiteralPath $Stage -Force
     Compress-Archive -LiteralPath $archiveItems.FullName -DestinationPath $OutputPath -Force

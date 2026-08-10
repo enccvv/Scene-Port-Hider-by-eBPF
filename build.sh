@@ -66,9 +66,9 @@ mkdir -p "$OUT"
     -I"$SRC" \
     -I"$LIBBPF_HEADERS" \
     -c "$SRC/whitelist.bpf.c" \
-    -o "$OUT/whitelist.bpf.o"
+    -o "$OUT/wl.bpf.o"
 
-"$BPFTOOL" gen skeleton "$OUT/whitelist.bpf.o" > "$SRC/whitelist.skel.h"
+"$BPFTOOL" gen skeleton "$OUT/wl.bpf.o" > "$SRC/whitelist.skel.h"
 
 "$TARGET_CC" -O2 -Wall -Wextra -static \
     -I"$SRC" \
@@ -80,4 +80,4 @@ mkdir -p "$OUT"
 
 chmod 0755 "$OUT/wl_loader" 2>/dev/null || \
     echo "Warning: could not chmod $OUT/wl_loader; this is normal on some /mnt/* WSL mounts."
-echo "Built $OUT/wl_loader and $OUT/whitelist.bpf.o"
+echo "Built $OUT/wl_loader and $OUT/wl.bpf.o"

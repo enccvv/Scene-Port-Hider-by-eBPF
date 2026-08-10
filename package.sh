@@ -42,7 +42,7 @@ fi
         webui_ctl.sh
         webroot/index.html
         system/bin/wl_loader
-        system/bin/whitelist.bpf.o
+        system/bin/wl.bpf.o
     )
     if [[ -f kernel_btf.sha256 ]]; then
         files+=(kernel_btf.sha256)

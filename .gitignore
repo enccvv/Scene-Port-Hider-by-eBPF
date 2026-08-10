@@ -6,5 +6,5 @@ deps/
 src/vmlinux.h
 src/whitelist.skel.h
 system/bin/wl_loader
-system/bin/whitelist.bpf.o
+system/bin/*.o
 *.log
